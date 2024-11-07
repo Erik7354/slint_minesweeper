@@ -1,0 +1,97 @@
+import { AboutSlint, Button, VerticalBox } from "std-widgets.slint";
+import { Tile, TileData, TileLogic } from "tile.slint";
+
+export { TileLogic }
+
+export global GameLogic {
+    pure callback restart();
+    pure callback tick();
+}
+
+export enum UIGameStatus {
+    Running, Win, GameOver
+}
+
+export component MainWindow inherits Window {
+
+    in property <string> bombs_text: "000";
+    in property <string> time_text: "000";
+    in property <bool> timer_running: true;
+    in property <UIGameStatus> status: UIGameStatus.Running;
+    in property <[[TileData]]> tiles: [];
+
+    VerticalLayout {
+        Rectangle { // top bar
+            height: 64px;
+            background: #AAAAAA;
+
+            border-width: 10px;
+            border-color: #333333;
+
+            HorizontalLayout {
+                alignment: stretch;
+                padding: parent.border-width;
+
+                Rectangle { // bomb count
+                    background: #000000;
+
+                    Text {
+                        text: bombs_text;
+                        font-size: 40px;
+                        font-weight: 700;
+                        color: #FF0000;
+                        vertical-alignment: center;
+                    }
+                }
+                Image { // smiley
+                    source: status == UIGameStatus.Win ? @image-url("icon/win.png")
+                    : status == UIGameStatus.GameOver ? @image-url("icon/game_over.png")
+                    : @image-url("icon/running.png");
+
+                    TouchArea {
+                        clicked => { GameLogic.restart(); }
+                    }
+                }
+                Rectangle { // timer
+                    background: #000000;
+
+                    Timer {
+                        interval: 1s;
+                        running: timer_running;
+                        triggered() => {
+                            GameLogic.tick();
+                        }
+                    }
+
+                    Text {
+                        text: time_text;
+                        font-size: 40px;
+                        font-weight: 700;
+                        color: #FF0000;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+        Rectangle { // board
+            background: #AAAAAA;
+
+            border-width: 10px;
+            border-color: #333333;
+
+            VerticalLayout {
+                padding: parent.border-width;
+
+                for row[i] in tiles: HorizontalLayout {
+                    for col[j] in row: Tile {
+                        cx: j;
+                        cy: i;
+                        data: col;
+                    }
+                }
+            }
+        }
+    }
+}
+
+

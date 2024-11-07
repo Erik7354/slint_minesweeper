@@ -1,0 +1,10 @@
+# IDE
+.idea
+.vscode
+
+# macOS
+.DS_Store
+Icon
+
+target/
+pkg/

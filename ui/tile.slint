@@ -1,0 +1,42 @@
+export global TileLogic {
+    pure callback tile_clicked(int,int);
+}
+
+export struct TileData {
+    revealed: bool,
+    adjacent_mines: int,
+    is_mine: bool,
+}
+
+export component Tile inherits Window {
+    in property <int> cx;
+    in property <int> cy;
+    in property <TileData> data;
+
+    property <image> bgimg: @image-url("icon/unopened.png");
+    
+    width: 32px;
+    height: 32px;
+
+    TouchArea {
+        clicked => {
+            TileLogic.tile_clicked(cx,cy);
+        }
+    
+        Image {
+            source: !data.revealed ? @image-url("icon/unopened.png")
+                : data.is_mine ? @image-url("icon/boom.png")
+                : data.adjacent_mines == 0 ? @image-url("icon/0.png")
+                : data.adjacent_mines == 1 ? @image-url("icon/1.png")
+                : data.adjacent_mines == 2 ? @image-url("icon/2.png")
+                : data.adjacent_mines == 3 ? @image-url("icon/3.png")
+                : data.adjacent_mines == 4 ? @image-url("icon/4.png")
+                : data.adjacent_mines == 5 ? @image-url("icon/5.png")
+                : data.adjacent_mines == 6 ? @image-url("icon/6.png")
+                : data.adjacent_mines == 7 ? @image-url("icon/7.png")
+                : @image-url("icon/8.png");
+            width: parent.width;
+            height: parent.height;
+        }
+    }
+}
