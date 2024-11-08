@@ -15,23 +15,37 @@ export component Tile inherits Window {
     in property <int> cy;
     in property <TileData> data;
 
+    property <bool> long_press_timer_running: false;
     property <image> bgimg: @image-url("icon/unopened.png");
     
     width: 32px;
     height: 32px;
 
     TouchArea {
-        clicked => {
-            if data.is-flagged {
-                return;
+        pointer-event(event) => {
+            // right click
+            if event.button == PointerEventButton.right && event.kind == PointerEventKind.up {
+                TileLogic.tile_right_clicked(cx,cy);
             }
 
-            TileLogic.tile_clicked(cx,cy);
+            // (long) left-click/touch
+            if event.button == PointerEventButton.left && event.kind == PointerEventKind.down {
+                long_press_timer_running = true;
+            }
+            if event.button == PointerEventButton.left && event.kind == PointerEventKind.up {
+                if long_press_timer_running == true {
+                    long_press_timer_running = false;
+                    TileLogic.tile_clicked(cx,cy);
+                }
+            }
         }
 
-        pointer-event(event) => {
-            if event.button == PointerEventButton.right && event.kind == PointerEventKind.up {
-                debug("right click");
+        // timer used to detect long presses
+        Timer {
+            interval: 400ms;
+            running: long_press_timer_running;
+            triggered() => {
+                long_press_timer_running = false;
                 TileLogic.tile_right_clicked(cx,cy);
             }
         }
