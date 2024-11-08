@@ -1,11 +1,13 @@
 export global TileLogic {
     pure callback tile_clicked(int,int);
+    pure callback tile_right_clicked(int,int);
 }
 
 export struct TileData {
     revealed: bool,
     adjacent_mines: int,
     is_mine: bool,
+    is_flagged: bool,
 }
 
 export component Tile inherits Window {
@@ -20,11 +22,25 @@ export component Tile inherits Window {
 
     TouchArea {
         clicked => {
+            if data.is-flagged {
+                return;
+            }
+
             TileLogic.tile_clicked(cx,cy);
         }
-    
+
+        pointer-event(event) => {
+            if event.button == PointerEventButton.right && event.kind == PointerEventKind.up {
+                debug("right click");
+                TileLogic.tile_right_clicked(cx,cy);
+            }
+        }
+
         Image {
-            source: !data.revealed ? @image-url("icon/unopened.png")
+            source: 
+                !data.revealed ? 
+                    !data.is-flagged ? @image-url("icon/unopened.png") 
+                    : @image-url("icon/flag.png")
                 : data.is_mine ? @image-url("icon/boom.png")
                 : data.adjacent_mines == 0 ? @image-url("icon/0.png")
                 : data.adjacent_mines == 1 ? @image-url("icon/1.png")

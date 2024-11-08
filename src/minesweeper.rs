@@ -25,6 +25,8 @@ pub struct Field {
     is_mine: bool,
     /// Indicates if the field has been revealed.
     is_revealed: bool,
+    /// Indicates if the field is flagged.
+    is_flagged: bool,
     /// The number of mines adjacent to this field.
     adjacent_mines: usize,
 }
@@ -42,6 +44,10 @@ impl Field {
 
     pub fn is_revealed(&self) -> bool {
         return self.is_revealed;
+    }
+
+    pub fn is_flagged(&self) -> bool {
+        return self.is_flagged;
     }
 
     /// Returns the number of adjacent mines if field is revealed, otherwise zero. 
@@ -66,6 +72,10 @@ pub struct Minesweeper {
     mine_count: usize,
     /// Number of fields that have been revealed to determine a win.
     revealed_count: usize,
+    /// Number of flags.
+    flagged_count: usize,
+    /// Number of fields that are mines and flagged.
+    flagged_mines_count: usize,
     /// 2D vector representing the game board.
     board: Vec<Vec<Field>>,
 }
@@ -78,6 +88,8 @@ pub fn new(set: Settings) -> Minesweeper {
         dy: set.dy,
         mine_count: set.mine_count,
         revealed_count: 0,
+        flagged_count: 0,
+        flagged_mines_count: 0,
         board: vec![vec![Field::default(); set.dx as usize]; set.dy as usize],
     };
 
@@ -99,13 +111,16 @@ impl Minesweeper {
         return self.board.clone();
     }
 
+    pub fn flagged_count(&self) -> usize {
+        return self.flagged_count;
+    }
+
     /// Returns the number of seconds the game has been running.
     ///
     /// This method keeps running even if the game status != Running.
     pub fn seconds_running(&self) -> usize {
         return SystemTime::now().duration_since(self.start).unwrap().as_secs() as usize;
     }
-
 
     /// (Re)starts the game.
     ///
@@ -116,6 +131,8 @@ impl Minesweeper {
         self.status = GameStatus::Running;
         self.start = SystemTime::now();
         self.revealed_count = 0;
+        self.flagged_count = 0;
+        self.flagged_mines_count = 0;
 
         // reset fields
         self.board = vec![vec![Field::default(); self.dx as usize]; self.dy as usize];
@@ -161,13 +178,16 @@ impl Minesweeper {
     /// This method reveals the field at the specified coordinates. 
     /// If the field is a mine, the game is over.
     /// If the field is a zero, it will reveal all adjacent non-mines.
-    /// If all non-mine fields are revealed, the game is won.
+    /// Checks if the game is won.
     pub fn reveal(&mut self, x: usize, y: usize) {
         if self.status != GameStatus::Running {
             return;
         }
 
         let f = &mut self.board[y][x];
+        if f.is_revealed || f.is_flagged {
+            return
+        }
         
         if f.is_mine { // mine => game over
             f.is_revealed = true;
@@ -180,10 +200,7 @@ impl Minesweeper {
             self.revealed_count += 1;
         }
 
-        // determine if all fields except mines are revealed
-        if (self.dx*self.dy) == (self.revealed_count+self.mine_count) {
-            self.status = GameStatus::Win;
-        }
+        self.check_win();
 
         self.print_board();
     }
@@ -195,7 +212,7 @@ impl Minesweeper {
     fn reveal_zeros(&mut self, x: usize, y: usize) {
         let f = &mut self.board[y][x];
 
-        if f.is_revealed { // trivial case: field already visited
+        if f.is_revealed || f.is_flagged { // trivial cases
             return
         }
 
@@ -223,6 +240,54 @@ impl Minesweeper {
         if y < self.dy-1 && x < self.dx-1 { self.reveal_zeros(x+1, y+1); }
     }
 
+    /// Flags or unflags the field at the given coordinates.
+    ///
+    /// This method flags or unflags the field at the specified coordinates. 
+    /// Flagged fields cant be revealed.
+    /// If the field is a mine, it counts towards winning.
+    /// Checks if the game is won.
+    pub fn flag(&mut self, x: usize, y: usize) {
+        if self.status != GameStatus::Running {
+            return;
+        }
+
+        let f = &mut self.board[y][x];
+        if f.is_revealed { // trivial case: field is already revealed
+            return;
+        }
+
+        if f.is_flagged { // unflag
+            f.is_flagged = false;
+
+            self.flagged_count -= 1;
+            if f.is_mine {
+                self.flagged_mines_count -= 1;
+            }
+        } else { // flag
+            f.is_flagged = true;
+
+            self.flagged_count += 1;
+            if f.is_mine {
+                self.flagged_mines_count += 1;
+            }
+        }
+
+        self.check_win();
+
+        self.print_board();
+    }
+
+    // Checks if the game is won.
+    fn check_win(&mut self) {
+        // determine if all fields except mines are revealed
+        if (self.dx*self.dy) == (self.revealed_count+self.mine_count) {
+            self.status = GameStatus::Win;
+        }
+        if self.flagged_mines_count == self.mine_count {
+            self.status = GameStatus::Win;
+        }
+    }
+
     /// Prints board to stdout for debugging.
     ///
     /// * revealed fields are prefixed with 'r'
@@ -232,6 +297,9 @@ impl Minesweeper {
         let dx = self.dx*3+1;
 
         println!("|{:?}", self.status);
+        println!("|mc: {:?}", self.mine_count);
+        println!("|fc: {:?}", self.flagged_count);
+        println!("|fmc: {:?}", self.flagged_mines_count);
         println!("|{}|", String::from("-").repeat(dx));
         for row in self.board.iter() {
             print!("| ");
