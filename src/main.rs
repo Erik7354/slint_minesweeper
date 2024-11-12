@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-use std::ptr::null;
-
 mod minesweeper;
 mod ui;
 
