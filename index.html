@@ -13,6 +13,12 @@
             <h2 class="text-2xl">Made with Slint</h2>
         </div>
         
+        <ul class="menu menu-horizontal bg-base-200 rounded-box">
+            <li><button onclick="settings(8,8,10)" class="text-green-300">Anfänger</button></li>
+            <li><button onclick="settings(16,16,40)" class="text-yellow-300">Fortgeschritten</button></li>
+            <li><button onclick="settings(30,16,99)" class="text-red-300">Experte</button></li>
+        </ul>
+
         <div class="mockup-window bg-base-200 border w-min h-min">
             <div class="bg-base-300 flex justify-center px-6 py-6">
                 <canvas id="canvas" class="mx-auto"></canvas>
@@ -23,6 +29,11 @@
             // import the generated file.
             import init from "./pkg/slint_minesweeper.js";
             init();
+        </script>
+        <script>
+            function settings(dx, dy, mineCount) {
+                window.location = window.location.pathname + "?width="+dx + "&height="+dy + "&mine_count="+mineCount;
+            }
         </script>
     </body>
 </html>

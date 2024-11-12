@@ -4,7 +4,9 @@ build:
 build/wasm:
 	wasm-pack build --target web
 
-build/release:
+build/all: build build/wasm
+
+build/all/release:
 	cargo build --release
 	wasm-pack build --release --target web
 
