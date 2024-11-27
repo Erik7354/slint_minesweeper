@@ -1,5 +1,3 @@
-use std::ops::Index;
-
 mod minesweeper;
 mod ui;
 
@@ -11,6 +9,7 @@ pub fn main() {
     ui::run(ms).unwrap();
 }
 
+#[allow(unused_macros)]
 macro_rules! log {
     ( $( $t:tt )* ) => {
         web_sys::console::log_1(&format!( $( $t )* ).into());

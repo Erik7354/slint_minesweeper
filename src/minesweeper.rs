@@ -14,8 +14,11 @@ pub struct Settings {
     /// Number of mines on the game board.
     pub mine_count: usize 
 }
+#[allow(dead_code)]
 pub const BEGINNER_SETTINGS: Settings = Settings { dx: 8, dy: 8, mine_count: 10 };
+#[allow(dead_code)]
 pub const INTERMEDIATE_SETTINGS: Settings = Settings { dx: 16, dy: 16, mine_count: 40 };
+#[allow(dead_code)]
 pub const EXPERT_SETTINGS: Settings = Settings { dx: 30, dy: 16, mine_count: 99 };
 
 /// Represents a single field on the Minesweeper game board.
