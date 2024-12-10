@@ -1,3 +1,5 @@
+default: build/all/release
+
 build:
 	cargo build
 
