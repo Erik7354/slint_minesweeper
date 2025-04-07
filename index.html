@@ -1,18 +1,21 @@
 <html>
-    <head>
-        <title>Minesweeper</title>
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <title>Minesweeper</title>
 
-        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="flex flex-col justify-center items-center gap-6 md:mt-12">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="tailwind.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <main class="flex flex-col justify-start items-center gap-6 md:mt-12">
         <div>
             <h1 class="text-5xl">Minesweeper</h1>
-            <h2 class="text-2xl">Made with Slint</h2>
+            <h2 class="text-2xl">Made with Rust+Slint</h2>
+            <a href="https://github.com/erik7354/slint_minesweeper" class="link">→ Code</a>
         </div>
-        
+
         <ul class="menu menu-horizontal bg-base-200 rounded-box">
             <li><button onclick="settings(8,8,10)" class="text-green-300">Anfänger</button></li>
             <li><button onclick="settings(16,16,40)" class="text-yellow-300">Fortgeschritten</button></li>
@@ -25,15 +28,22 @@
             </div>
         </div>
 
-        <script type="module">
-            // import the generated file.
-            import init from "./pkg/slint_minesweeper.js";
-            init();
-        </script>
-        <script>
-            function settings(dx, dy, mineCount) {
-                window.location = window.location.pathname + "?width="+dx + "&height="+dy + "&mine_count="+mineCount;
-            }
-        </script>
-    </body>
+        <a href="https://slint.dev" class="max-w-42">
+            <img src="made-with-slint.png" class="" alt="made with slint badge" />
+        </a>
+
+    </main>
+
+    <script type="module">
+        // import the generated file.
+        import init from "./pkg/slint_minesweeper.js";
+        init();
+    </script>
+    <script>
+        function settings(dx, dy, mineCount) {
+            window.location = window.location.pathname + "?width=" + dx + "&height=" + dy + "&mine_count=" + mineCount;
+        }
+    </script>
+</body>
+
 </html>

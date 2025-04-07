@@ -6,5 +6,11 @@
 .DS_Store
 Icon
 
+# build
 target/
 pkg/
+tailwind.css
+
+# Node
+node_modules/
+npm-debug.log

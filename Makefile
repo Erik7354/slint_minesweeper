@@ -1,16 +1,20 @@
-default: build/all/release
+default: build/release
+
+build/css:
+	npx tailwindcss -i index.css -o tailwind.css --minify
 
 build:
 	cargo build
 
-build/wasm:
+build/web: build/css
 	wasm-pack build --target web
 
-build/all: build build/wasm
-
-build/all/release:
+build/release: build/css
 	cargo build --release
 	wasm-pack build --release --target web
 
 run:
 	cargo run
+
+run/web: build/web
+	caddy run --config Caddyfile
