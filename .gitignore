@@ -4,7 +4,6 @@
 
 # macOS
 .DS_Store
-Icon
 
 # build
 target/
