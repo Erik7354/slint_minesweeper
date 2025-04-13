@@ -1,7 +1,7 @@
 default: build/release
 
 build/css:
-	npx tailwindcss -i index.css -o tailwind.css --minify
+	npx @tailwindcss/cli -i index.css -o tailwind.css --minify
 
 build:
 	cargo build
